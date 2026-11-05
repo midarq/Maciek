@@ -46,11 +46,16 @@ endpoint `public/kontakt/wyslij.php`, wymagający działającego `mail()`.
 - `src/styles.css` — typografia, układ i kolory.
 - `src/data.ts` — dane kontaktowe, partnerzy i tłumaczenia interfejsu.
 - `src/urls.ts` — adresy plików i obsługa ścieżki hostingu.
+- `src/motion.tsx` — animacje wejścia, tło jezior i przełącznik wyglądu.
 - `public/assets/` — zdjęcia, logotypy, fonty i dokumenty.
 
 Brakujące informacje edycji 2027 mają wartość `null` lub pustą listę.
 Przed uruchomieniem zapisów należy uzupełnić prawdziwe linki w `src/edition.ts`.
 Fonty są hostowane lokalnie; ich licencje znajdują się w `public/assets/fonts/`.
+
+Przełącznik w prawym dolnym rogu wybiera wariant klasyczny lub tło jezior.
+Wybór jest zapamiętywany lokalnie w przeglądarce. Animacje uwzględniają
+systemowe ustawienie ograniczonego ruchu.
 
 Archiwa, lokalne instrukcje, prompty, dane środowiska i pliki poświadczeń są
 wykluczone z repozytorium przez `.gitignore`.

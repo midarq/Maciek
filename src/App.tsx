@@ -7,6 +7,7 @@ import type { Locale } from './data'
 import { events2027 } from './edition'
 import { Athlete2027, Event2027Page, Home2027, Partners2027, Program2027, Registration2027, Rules2027, Search2027, Spectator2027 } from './edition-pages'
 import { ArticlePage, ContactPage, ContentRoute, MissingPage } from './pages'
+import { SiteMotion } from './motion'
 
 class PageBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false }
@@ -62,5 +63,5 @@ export default function App() {
   else if (history.some(item => item.slug === slug)) page = <ArticlePage lang={lang} slug={slug} />
   else if (/^(?:2026\/|category\/|portfolio\/|pl\/|opis-imprezy|regulamin|formularz|rejestracja|blog-home-page|search-results-page|triathlon-lipiany-2024)/.test(slug)) page = <ContentRoute lang={lang} slug={slug} />
   else page = <MissingPage lang={lang} />
-  return <><a className="skip-link" href="#main">{labels[lang].skip}</a><Header lang={lang} slug={slug} /><main id="main" tabIndex={-1}><PageBoundary key={`${lang}/${slug}`}>{page}</PageBoundary></main><Footer lang={lang} /></>
+  return <><a className="skip-link" href="#main">{labels[lang].skip}</a><Header lang={lang} slug={slug} /><main id="main" tabIndex={-1}><PageBoundary key={`${lang}/${slug}`}>{page}</PageBoundary></main><Footer lang={lang} /><SiteMotion lang={lang} pageKey={location.pathname} /></>
 }

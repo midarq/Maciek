@@ -694,3 +694,20 @@ h4, h5, h6 { font-size: var(--title-sm); }
   .search-form { min-height: 48px; padding-block: 10px; }
 }
 
+/* Subtelne tło pojezierza i przełącznik wariantów. */
+#root { isolation: isolate; }
+#main, .footer { position: relative; z-index: 1; }
+.footer { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+.lake-background { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; background: #f5f8f7; }
+[data-scene=lakes] .weekend-overview, [data-scene=lakes] .page-intro, [data-scene=lakes] .variant-section:nth-of-type(even) { background: #ffffffb8; }
+[data-scene=lakes] .event-hero { background: #f5f8f7b8; }
+[data-scene=lakes] .partners-section { background: #ffffffd9; }
+.appearance-switch { position: fixed; z-index: 90; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 2px; padding: 3px; border: 1px solid #d5dfe3; border-radius: 8px; color: var(--muted); background: #fffffff5; box-shadow: 0 3px 18px #091b2812; }
+.appearance-switch button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 12px; border-radius: 5px; font-size: 1rem; font-weight: 600; line-height: var(--line-ui); background: transparent; transition: background .2s, color .2s; }
+.appearance-switch button:hover { color: var(--blue); background: var(--blue-pale); }
+.appearance-switch button[aria-pressed=true] { color: var(--white); background: var(--blue); }
+.appearance-switch svg { width: 18px; height: 18px; }
+@media (prefers-reduced-motion:reduce) {
+  .appearance-switch button { transition: none; }
+}
+
