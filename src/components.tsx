@@ -123,7 +123,7 @@ export function Header({ lang, slug }: { lang: Locale; slug: string }) {
 
 export function Footer({ lang }: { lang: Locale }) {
   const t = labels[lang]
-  return <footer className="footer"><div className="shell">
+  return <><div className="discipline-stripe footer-stripe" aria-hidden="true"><span /><span /><span /></div><footer className="footer"><div className="shell">
     <div className="footer__grid">
       <div className="footer__brand">
         <div className="footer__identity"><Brand lang={lang} /><FacebookLink lang={lang} className="footer__social" /></div>
@@ -146,7 +146,7 @@ export function Footer({ lang }: { lang: Locale }) {
         <p className="footer__organizer">{t.organizer}</p>
       </div>
     </div>
-  </div></footer>
+  </div></footer></>
 }
 
 export function PartnerGroups({ lang }: { lang: Locale }) {
