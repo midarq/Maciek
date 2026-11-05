@@ -496,14 +496,13 @@ h4, h5, h6 { font-size: var(--title-sm); }
 .weekend-overview__heading { margin-bottom: 24px; }
 .weekend-overview__heading .eyebrow { margin-bottom: 12px; color: var(--muted); }
 .weekend-overview__heading h2 { text-wrap: balance; }
-.audience-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
-.audience-card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: var(--paper); text-decoration: none; border: 1px solid transparent; border-radius: 4px; }
-.audience-card__image { display: block; aspect-ratio: 2/1; overflow: hidden; background: var(--navy); }
-.audience-card__image img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
-.audience-card__body { display: block; flex: 1; padding: 24px; }
-.audience-card p { color: var(--muted); margin-top: 12px; font-size: var(--text-small); line-height: var(--line-compact); }
-.audience-card:hover { border-color: var(--blue); }
-.audience-card:hover h3 { color: var(--blue); }
+.audience-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px; }
+.audience-card__image { aspect-ratio: 16/10; }
+.audience-card__image img { object-position: center 20%; }
+.audience-card .race-card__title { overflow-wrap: anywhere; }
+.audience-card .race-card__stripe { background: var(--blue); }
+.audience-card .race-card__description { margin-top: 0; }
+.audience-card:hover { box-shadow: 0 0 0 1px var(--blue), 0 16px 45px #0f293616; }
 .event-hero .signup-state { margin-top: 24px; }
 .event-hero__facts { margin-top: 18px; font: 700 var(--text-ui)/var(--line-ui) var(--font-family); }
 .event-hero { background: var(--paper); color: var(--ink); }
@@ -598,8 +597,6 @@ h4, h5, h6 { font-size: var(--title-sm); }
 @media (max-width:767px) {
   .weekend-overview { padding-block: 32px; }
   .audience-grid { grid-template-columns: 1fr; gap: 12px; }
-  .audience-card__body { padding: 20px; }
-  .audience-card p { margin-top: 8px; }
   .partners-section { padding-block: 26px; }
   .partner-groups { grid-template-columns: 1fr; gap: 24px; }
   .partner-group > h2 { margin-bottom: 12px; }
