@@ -362,11 +362,20 @@ h4, h5, h6 { font-size: var(--title-sm); }
 }
 @media (max-width:767px) {
   :root {
-    --header-height: 72px;
-    --title-xl: clamp(2.2rem,8vw,3.5rem);
-    --title-lg: clamp(1.9rem,6vw,2.25rem);
-    --title-md: 1.6rem;
-    --title-card: clamp(2rem,8.5vw,3rem);
+    --header-height: 64px;
+    --gutter: 16px;
+    --text-base: 1rem;
+    --text-caption: .75rem;
+    --text-ui: 1.125rem;
+    --text-ui-large: 1.25rem;
+    --line-body: 1.45;
+    --line-compact: 1.4;
+    --tracking-label: .08em;
+    --title-xl: clamp(1.875rem,7.5vw,2.5rem);
+    --title-lg: clamp(1.5rem,6vw,1.875rem);
+    --title-md: 1.25rem;
+    --title-sm: 1.125rem;
+    --title-card: clamp(1.125rem,5vw,1.375rem);
   }
   .header__languages, .header__search { display: none; }
   .brand__name { font-size: 1.6rem; }
@@ -376,30 +385,30 @@ h4, h5, h6 { font-size: var(--title-sm); }
   .header__inner { gap: 10px; }
   .header__actions { gap: 4px; }
   .brand { gap: 6px; }
-  .race-grid { grid-template-columns: 1fr; gap: 25px; }
-  .race-card__image { aspect-ratio: 5/4; }
-  .race-card__body { padding: 22px; }
+  .race-grid { grid-template-columns: 1fr; gap: 12px; }
+  .race-card__image { aspect-ratio: 3/2; }
+  .race-card__body { padding: 12px; }
   .race-card__distance { font-size: var(--text-small); }
   .race-card__link { margin-top: 20px; }
   .registration-band__inner { align-items: flex-start; flex-direction: column; }
   .registration-band .button { min-width: 175px; }
-  .event-hero__inner { grid-template-columns: 1fr; padding-block: 25px 35px; }
-  .event-hero__photo img { aspect-ratio: 5/4; }
+  .event-hero__inner { grid-template-columns: 1fr; gap: 20px; padding-block: 22px 24px; }
+  .event-hero__photo img { aspect-ratio: 16/9; max-height: 220px; object-position: 50% 25%; }
   .event-hero__photo { margin-top: 5px; }
   .event-tabs > .shell { gap: 23px; }
   .event-tabs a { font-size: var(--text-small); padding-block: 16px 14px; }
-  .event-section { padding-block: 35px; }
+  .event-section { padding-block: 24px; }
   .rich-content .vc-row { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
   .rich-content .vc-col { grid-column: span 2; }
   .rich-content .vc-span-3 { grid-column: span 1; }
   .rich-content .vc-row > .vc-span-3:has(+ .vc-span-6) { display: none; }
   .rich-content .vc-row > .vc-span-6 + .vc-span-3 { display: none; }
-  .contact-layout { grid-template-columns: 1fr; gap: 40px; }
+  .contact-layout { grid-template-columns: 1fr; gap: 24px; }
   .contact-form { padding-top: 10px; }
-  .footer { padding-top: 22px; }
-  .footer__grid { grid-template-columns: 1fr; gap: 16px; padding-bottom: 16px; }
+  .footer { padding-top: 18px; }
+  .footer__grid { grid-template-columns: 1fr; gap: 14px; padding-bottom: 16px; }
   .footer__brand { display: block; }
-  .footer .brand__name { font-size: 1.35rem; }
+  .footer .brand__name { font-size: 1.125rem; }
   .footer__brand > p { max-width: 46ch; margin-top: 6px; }
   .footer__group h2 { margin-bottom: 8px; }
   .footer__links { grid-template-columns: max-content max-content; column-gap: 24px; }
@@ -562,10 +571,10 @@ h4, h5, h6 { font-size: var(--title-sm); }
   .edition-race-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width:767px) {
-  .edition-race-grid, .registration-grid { grid-template-columns: 1fr; }
-  .resource-grid, .water-distances, .rules-list { grid-template-columns: 1fr; gap: 22px; }
+  .edition-race-grid, .registration-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .resource-grid, .water-distances, .rules-list { grid-template-columns: 1fr; gap: 18px; }
   .variant-navigation { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
-  .variant-navigation a { font-size: var(--text-ui); padding: 14px; }
+  .variant-navigation a { min-height: 48px; font-size: var(--text-ui); padding: 10px 12px; }
   .distance-grid { gap: 10px; }
   .distance-grid > div { padding: 14px 10px; }
   .distance-grid dt { font-size: var(--text-small); }
@@ -595,15 +604,15 @@ h4, h5, h6 { font-size: var(--title-sm); }
 }
 
 @media (max-width:767px) {
-  .weekend-overview { padding-block: 32px; }
+  .weekend-overview { padding-block: 24px; }
   .audience-grid { grid-template-columns: 1fr; gap: 12px; }
-  .partners-section { padding-block: 26px; }
-  .partner-groups { grid-template-columns: 1fr; gap: 24px; }
+  .partners-section { padding-block: 20px; }
+  .partner-groups { grid-template-columns: 1fr; gap: 20px; }
   .partner-group > h2 { margin-bottom: 12px; }
   .partner-grid, .partner-group--sponsors .partner-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px 20px; max-width: 440px; margin-inline: auto; }
   .partner-group--media .partner-grid { grid-template-columns: 1fr; max-width: 144px; }
-  .partner-link { min-height: 52px; }
-  .partner-mark { height: 40px; }
+  .partner-link { min-height: 44px; }
+  .partner-mark { height: 36px; }
 }
 
 @media (max-width:1023px) {
@@ -620,6 +629,64 @@ h4, h5, h6 { font-size: var(--title-sm); }
   .home-hero__location { right: var(--gutter); bottom: 20px; font-size: var(--text-caption); }
 }
 @media (max-width:767px) {
-  .home-hero__visual { aspect-ratio: 3/2; }
+  .section { padding-block: 24px; }
+  .section-heading, .weekend-overview__heading { margin-bottom: 16px; }
+  .section-heading .eyebrow, .weekend-overview__heading .eyebrow { margin-bottom: 8px; }
+  .button, .button--large { min-height: 44px; padding: 10px 16px; gap: 10px; }
+  .button-row { gap: 8px; }
+  .header .brand__name { font-size: 1.125rem; }
+  .header .brand__mark { width: 36px; height: 30px; }
+  .header__inner { gap: 8px; }
+  .header__signup { min-height: 44px; padding: 9px 10px; font-size: 1rem; }
+  .mobile-menu__top, .mobile-menu__bottom { padding-inline: 16px; }
+  .mobile-menu__nav { padding: 16px; }
+  .mobile-menu__nav > a, .mobile-menu summary { min-height: 44px; padding-block: 12px; }
+  .mobile-menu details a { min-height: 44px; padding-block: 10px; }
+  .mobile-menu__bottom { padding-block: 12px; }
+  .home-hero { --hero-title: clamp(2rem,8.5vw,2.625rem); --hero-copy: 1rem; --hero-date: 1.125rem; }
+  .home-hero__inner { padding-block: 18px; }
+  .hero-date { margin-bottom: 8px; }
+  .home-hero__lead { margin-top: 12px; }
+  .home-hero .button-row { margin-top: 14px; }
+  .home-hero .button { min-height: 44px; padding-inline: 14px; font-size: var(--text-ui); }
+  .home-hero__visual { aspect-ratio: 16/9; }
+  .home-hero__image { object-position: 50% 25%; }
+  .home-hero__location { bottom: 14px; }
+  .race-card__image img { object-position: 50% 25%; }
+  .registration-grid .race-card__image { aspect-ratio: 3/2; }
+  .race-card .race-card__title { left: 12px; right: 10px; bottom: 12px; }
+  .race-card__stripe { flex-basis: 4px; height: 4px; }
+  .race-card__body { padding: 12px; }
+  .race-card__description { margin-top: 8px; }
+  .race-card__distance { margin-top: 8px; }
+  .race-card__actions { padding-top: 10px; }
+  .race-card .event-signup { padding-inline: 8px; font-size: 1rem; }
+  .audience-card { display: grid; grid-template-columns: minmax(0,.9fr) 4px minmax(0,1.1fr); }
+  .audience-card__image { aspect-ratio: auto; min-height: 120px; }
+  .audience-card__image img { position: absolute; inset: 0; object-position: 50% 10%; }
+  .audience-card .race-card__stripe { width: 4px; height: auto; }
+  .audience-card .race-card__title { hyphens: auto; }
+  .audience-card .race-card__body { justify-content: center; padding: 14px; }
+  .page-intro { padding-block: 24px; }
+  .breadcrumb, .event-hero .breadcrumb { margin-bottom: 16px; }
+  .page-intro > .shell > p, .event-hero__lead { margin-top: 12px; }
+  .page-intro .button, .event-hero .signup-state { margin-top: 18px; }
+  .variant-navigation { padding-block: 18px; }
+  .distance-grid, .resource-grid, .page-toc, .program-links, .event-facts { margin-block: 18px; }
+  .first-triathlon, .party-note, .distance-option { padding: 16px; margin-block: 18px; }
+  .start-slot { margin-block: 14px; padding-block: 12px; }
+  .info-block { padding-block: 20px; margin-bottom: 18px; }
+  .info-block h2 { margin-bottom: 12px; }
+  .page-toc { gap: 8px; }
+  .page-toc a { padding: 10px 12px; }
+  .program-day { margin-block: 24px; }
+  .program-links a { min-height: 48px; padding: 12px; }
+  .schedule-table { margin-block: 16px; }
+  .schedule-table tr { padding: 10px 12px; margin-bottom: 10px; }
+  .schedule-table td { grid-template-columns: 70px minmax(0,1fr); gap: 8px; padding-block: 6px; }
+  .contact-details > a { padding-block: 12px; }
+  .contact-form, .form-grid { gap: 14px; }
+  .contact-form input:not([type=checkbox]), .contact-form textarea { min-height: 44px; padding: 10px 12px; }
+  .search-form { min-height: 48px; padding-block: 10px; }
 }
 
