@@ -47,6 +47,7 @@ endpoint `public/kontakt/wyslij.php`, wymagający działającego `mail()`.
 - `src/data.ts` — dane kontaktowe, partnerzy i tłumaczenia interfejsu.
 - `src/urls.ts` — adresy plików i obsługa ścieżki hostingu.
 - `src/motion.tsx` — łagodny fade-in oraz interaktywne tło jezior.
+- `src/lakes.ts` — uproszczone obrysy regionalnych jezior.
 - `src/water.ts` — tłumione fale powierzchni i odkształcanie linii tła.
 - `public/assets/` — zdjęcia, logotypy, fonty i dokumenty.
 
@@ -54,9 +55,12 @@ Brakujące informacje edycji 2027 mają wartość `null` lub pustą listę.
 Przed uruchomieniem zapisów należy uzupełnić prawdziwe linki w `src/edition.ts`.
 Fonty są hostowane lokalnie; ich licencje znajdują się w `public/assets/fonts/`.
 
-Tło jezior jest wspólne dla strony. Reaguje na dotyk i przewijanie, a sekcje
-oddzielają cienkie linie. Animacje uwzględniają systemowe ustawienie
-ograniczonego ruchu.
+Tło jezior pozostaje nieruchome podczas przewijania. Kliknięcie lub pojedyncze
+dotknięcie tła wywołuje delikatne, wygasające odkształcenie linii. Gest przewijania
+nie uruchamia fal. Animacje uwzględniają systemowe ustawienie ograniczonego ruchu.
+Obrysy Wądołu, Kościelnego i Chłopa są inspirowane mapami w
+[analizie zagrożeń na obszarach wodnych gminy Lipiany z 2025 roku](https://lipiany.pl/wp-content/uploads/2025/07/Analiza-zagrozen-na-obszarach-wodnych-Gm.-Lipiany-2025.pdf)
+(strony 31, 27 i 21). Równoległe kontury wokół brzegów są dekoracją, nie pomiarem głębokości.
 
 Archiwa, lokalne instrukcje, prompty, dane środowiska i pliki poświadczeń są
 wykluczone z repozytorium przez `.gitignore`.

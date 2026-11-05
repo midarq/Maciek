@@ -704,7 +704,7 @@ h4, h5, h6 { font-size: var(--title-sm); }
 /* Subtelne tło pojezierza widoczne pomiędzy kartami i sekcjami. */
 #root { isolation: isolate; }
 #main, .footer { position: relative; z-index: 1; }
-.lake-background { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; background: #f5f8f7; }
+.lake-background { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100vh; height: 100lvh; pointer-events: none; background: #f5f8f7; }
 .weekend-overview, .partners-section, .page-intro, .event-hero, .variant-section:nth-of-type(even), .event-section:nth-child(even) { background: transparent; }
 .partner-mark img[src$=".jpg"] { mix-blend-mode: multiply; }
 #main > section + section { position: relative; border-top: 0; }
