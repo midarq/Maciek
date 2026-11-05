@@ -45,14 +45,17 @@ export function Home2027({ lang }: Props) {
     <section className="section weekend-overview"><div className="shell">
       <header className="weekend-overview__heading"><p className="eyebrow">{ui(lang, 'Jeden weekend. Wiele powodów, by tu być.', 'Ein Wochenende. Viele Gründe, dabei zu sein.')}</p><h2>{ui(lang, 'Sport i spotkanie', 'Sport und Begegnung')}</h2></header>
       <div className="audience-grid">{[
-        { slug: 'program', image: '/assets/img/weekend-program.jpg', imageSmall: '/assets/img/weekend-program-800.jpg', height: 933, title: ui(lang, 'Program weekendu', 'Wochenendprogramm'), copy: ui(lang, 'W sobotę po zawodach przewidziana jest impreza dla uczestników.', 'Am Samstag ist nach den Wettkämpfen ein Treffen für Teilnehmer vorgesehen.') },
-        { slug: 'dla-zawodnika', image: '/assets/img/tresc/290691924_571654034329279_7826286303397459888_n.jpg', imageSmall: '/assets/img/tresc/290691924_571654034329279_7826286303397459888_n-w800.jpg', height: 934, title: ui(lang, 'Dla zawodnika', 'Für Teilnehmer'), copy: ui(lang, 'Przygotuj swój start. Pakiety, regulaminy, dojazd i kontakt w jednym miejscu.', 'Bereite deinen Start vor. Unterlagen, Regeln, Anreise und Kontakt an einem Ort.') },
-        { slug: 'dla-kibica', image: '/assets/img/weekend-spectators.jpg', imageSmall: '/assets/img/weekend-spectators-800.jpg', height: 933, title: ui(lang, 'Dla kibica', 'Für Zuschauer'), copy: ui(lang, 'Zaplanuj sportowy weekend z bliskimi. Sprawdź program i informacje dla kibiców.', 'Plane ein Sportwochenende mit deinen Liebsten. Programm und Informationen für Zuschauer.') },
-      ].map(item => <Link className="race-card audience-card" to={path(lang, item.slug)} key={item.slug}>
-        <div className="race-card__image audience-card__image"><img src={localUrl(item.image)} srcSet={`${localUrl(item.imageSmall)} 800w, ${localUrl(item.image)} 1400w`} sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1536px) 30vw, 464px" width="1400" height={item.height} alt="" loading="lazy" decoding="async" /><h3 className="race-card__title">{item.title}</h3></div>
-        <span className="race-card__stripe" aria-hidden="true" />
-        <div className="race-card__body"><p className="race-card__description">{item.copy}</p></div>
-      </Link>)}</div>
+        { slug: 'program', image: '/assets/img/weekend-program.jpg', imageSmall: '/assets/img/weekend-program-800.jpg', height: 933, title: ui(lang, 'Program weekendu', 'Wochenendprogramm'), accent: ui(lang, 'Program', 'Wochenendprogramm'), copy: ui(lang, 'W sobotę po zawodach przewidziana jest impreza dla uczestników.', 'Am Samstag ist nach den Wettkämpfen ein Treffen für Teilnehmer vorgesehen.') },
+        { slug: 'dla-zawodnika', image: '/assets/img/tresc/290691924_571654034329279_7826286303397459888_n.jpg', imageSmall: '/assets/img/tresc/290691924_571654034329279_7826286303397459888_n-w800.jpg', height: 934, title: ui(lang, 'Dla zawodnika', 'Für Teilnehmer'), accent: ui(lang, 'zawodnika', 'Teilnehmer'), copy: ui(lang, 'Przygotuj swój start. Pakiety, regulaminy, dojazd i kontakt w jednym miejscu.', 'Bereite deinen Start vor. Unterlagen, Regeln, Anreise und Kontakt an einem Ort.') },
+        { slug: 'dla-kibica', image: '/assets/img/weekend-spectators.jpg', imageSmall: '/assets/img/weekend-spectators-800.jpg', height: 933, title: ui(lang, 'Dla kibica', 'Für Zuschauer'), accent: ui(lang, 'kibica', 'Zuschauer'), copy: ui(lang, 'Zaplanuj sportowy weekend z bliskimi. Sprawdź program i informacje dla kibiców.', 'Plane ein Sportwochenende mit deinen Liebsten. Programm und Informationen für Zuschauer.') },
+      ].map(item => {
+        const accentStart = item.title.indexOf(item.accent)
+        return <Link className={`race-card audience-card audience-card--${item.slug}`} to={path(lang, item.slug)} key={item.slug}>
+          <div className="race-card__image audience-card__image"><img src={localUrl(item.image)} srcSet={`${localUrl(item.imageSmall)} 800w, ${localUrl(item.image)} 1400w`} sizes="(max-width: 767px) calc(100vw - 40px), (max-width: 1536px) 30vw, 464px" width="1400" height={item.height} alt="" loading="lazy" decoding="async" /><h3 className="race-card__title">{item.title.slice(0, accentStart)}<span className="race-card__title-accent">{item.accent}</span>{item.title.slice(accentStart + item.accent.length)}</h3></div>
+          <span className="race-card__stripe" aria-hidden="true" />
+          <div className="race-card__body"><p className="race-card__description">{item.copy}</p></div>
+        </Link>
+      })}</div>
     </div></section>
     <section className="partners-section"><div className="shell"><PartnerGroups lang={lang} /></div></section>
   </>

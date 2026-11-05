@@ -506,10 +506,14 @@ h4, h5, h6 { font-size: var(--title-sm); }
 .weekend-overview__heading .eyebrow { margin-bottom: 12px; color: var(--muted); }
 .weekend-overview__heading h2 { text-wrap: balance; }
 .audience-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 22px; }
+.audience-card { --info-color: var(--green); }
+.audience-card--dla-zawodnika { --info-color: var(--yellow); }
+.audience-card--dla-kibica { --info-color: var(--blue); }
 .audience-card__image { aspect-ratio: 16/10; }
 .audience-card__image img { object-position: center 20%; }
 .audience-card .race-card__title { overflow-wrap: anywhere; }
-.audience-card .race-card__stripe { background: var(--blue); }
+.audience-card .race-card__title-accent { color: var(--info-color); }
+.audience-card .race-card__stripe { background: var(--info-color); }
 .audience-card .race-card__description { margin-top: 0; }
 .audience-card:hover { box-shadow: 0 0 0 1px var(--blue), 0 16px 45px #0f293616; }
 .event-hero .signup-state { margin-top: 24px; }
