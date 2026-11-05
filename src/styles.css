@@ -405,13 +405,19 @@ h4, h5, h6 { font-size: var(--title-sm); }
   .rich-content .vc-row > .vc-span-6 + .vc-span-3 { display: none; }
   .contact-layout { grid-template-columns: 1fr; gap: 24px; }
   .contact-form { padding-top: 10px; }
-  .footer { padding-top: 18px; }
-  .footer__grid { grid-template-columns: 1fr; gap: 14px; padding-bottom: 16px; }
-  .footer__brand { display: block; }
+  .footer { padding-top: 16px; }
+  .footer__grid { grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); grid-template-areas: 'brand brand' 'events information' 'contact contact'; gap: 12px 20px; padding-bottom: 16px; }
+  .footer__brand { display: block; grid-area: brand; }
+  .footer__events { grid-area: events; }
+  .footer__information { grid-area: information; }
+  .footer__contact-group { grid-area: contact; padding-top: 10px; border-top: 1px solid #ffffff24; }
+  .footer__identity { justify-content: space-between; }
   .footer .brand__name { font-size: 1.125rem; }
-  .footer__brand > p { max-width: 46ch; margin-top: 6px; }
+  .footer__brand > p { max-width: none; margin-top: 4px; }
   .footer__group h2 { margin-bottom: 8px; }
-  .footer__links { grid-template-columns: max-content max-content; column-gap: 24px; }
+  .footer__links, .footer__links--columns { grid-template-columns: minmax(0,1fr); }
+  .footer__contact { gap: 2px 20px; }
+  .footer__contact a { min-height: 36px; }
 }
 @media (max-width:479px) {
   .brand__name { font-size: 1.22rem; }
