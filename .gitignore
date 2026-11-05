@@ -1,0 +1,27 @@
+node_modules/
+dist/
+archiwum/
+.env
+.env.*
+*.env
+!.env.example
+*.local
+.DS_Store
+.agents/
+.codex/
+.aws/
+.openai/
+.ssh/
+*.log
+*.har
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite*
+*.db
+*.zip
+
+# Local AI briefs, instructions and development notes stay outside the repository.
+*.md
+!/README.md

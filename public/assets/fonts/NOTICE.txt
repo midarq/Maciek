@@ -1,0 +1,13 @@
+Kroje pisma użyte na tej stronie
+===============================
+
+Barlow Condensed  — SIL Open Font License 1.1   https://fonts.google.com/specimen/Barlow+Condensed
+
+Licencja OFL 1.1 zezwala na hostowanie plików na własnym serwerze oraz
+na użycie komercyjne. Pełne teksty licencji znajdują się w plikach OFL-*.txt
+(jeśli ich brak, kanoniczny tekst: https://openfontlicense.org/).
+
+Aktywny krój całej witryny: Barlow Condensed 500, 600 i 700.
+Pliki .woff2 zawierają podzbiory latin i latin-ext.
+Pliki Inter i ich licencja są zachowane jako wcześniejsze zasoby; nie są używane
+w aktualnym CSS.
