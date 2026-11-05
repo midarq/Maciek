@@ -700,6 +700,7 @@ h4, h5, h6 { font-size: var(--title-sm); }
 .lake-background { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; background: #f5f8f7; }
 .weekend-overview, .partners-section, .page-intro, .event-hero, .variant-section:nth-of-type(even), .event-section:nth-child(even) { background: transparent; }
 .partner-mark img[src$=".jpg"] { mix-blend-mode: multiply; }
-#main > section + section { border-top: 1px solid var(--line); }
+#main > section + section { position: relative; border-top: 0; }
+#main > section + section::before { content: ''; position: absolute; top: 0; left: 50%; width: calc(min(100%, 1536px) - var(--gutter) * 2); height: 3px; border-radius: 2px; background: var(--line); transform: translateX(-50%); pointer-events: none; }
 .page-intro, .variant-section, .event-section { border-bottom: 0; }
 
