@@ -47,6 +47,7 @@ endpoint `public/kontakt/wyslij.php`, wymagający działającego `mail()`.
 - `src/data.ts` — dane kontaktowe, partnerzy i tłumaczenia interfejsu.
 - `src/urls.ts` — adresy plików i obsługa ścieżki hostingu.
 - `src/motion.tsx` — łagodny fade-in oraz interaktywne tło jezior.
+- `src/water.ts` — tłumione fale powierzchni i odkształcanie linii tła.
 - `public/assets/` — zdjęcia, logotypy, fonty i dokumenty.
 
 Brakujące informacje edycji 2027 mają wartość `null` lub pustą listę.

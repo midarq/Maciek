@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { WaterSurface } from './water'
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -59,7 +60,6 @@ function usePageReveal(pageKey: string, reduced: boolean) {
   }, [pageKey, reduced])
 }
 
-type Ripple = { x: number; y: number; age: number }
 const interactive = 'a, button, input, textarea, select, summary, label, dialog, [role="button"]'
 
 function LakeBackground({ reduced }: { reduced: boolean }) {
@@ -72,15 +72,17 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
     const washContext = wash.getContext('2d')
     let width = 0, height = 0, frame = 0, lastPaint = 0, phase = 0
     let targetX = 0, targetY = 0, pointerX = 0, pointerY = 0
-    let forceX = 0, forceY = 0, previousX = 0, previousY = 0, pressed = false
+    let forceX = 0, forceY = 0, previousX = 0, previousY = 0, pressed = false, touchingBackground = false, pendingTouch = false
     let targetScroll = scrollY, easedScroll = scrollY, previousScroll = scrollY
-    let lastRipple = 0
-    const ripples: Ripple[] = []
+    let water = new WaterSurface(1, 1), accumulator = 0
+    let lastImpact = 0, impactX = 0, impactY = 0
     const clamp = (value: number, limit: number) => Math.max(-limit, Math.min(limit, value))
 
     function resize() {
       width = innerWidth
       height = innerHeight
+      water = new WaterSurface(width, height)
+      accumulator = 0
       const ratio = Math.min(devicePixelRatio || 1, 1.5)
       canvas!.width = wash.width = Math.round(width * ratio)
       canvas!.height = wash.height = Math.round(height * ratio)
@@ -102,19 +104,22 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
 
     function lake(cx: number, cy: number, radius: number, rotation: number, color: string, seed: number) {
       const ctx = context!
-      ctx.save()
-      ctx.translate(cx, cy)
-      ctx.rotate(rotation)
+      const cosine = Math.cos(rotation), sine = Math.sin(rotation)
+      function point(x: number, y: number, first = false) {
+        water.project(cx + x * cosine - y * sine, cy + x * sine + y * cosine)
+        if (first) ctx.moveTo(water.x, water.y)
+        else ctx.lineTo(water.x, water.y)
+      }
       for (let ring = 0; ring < 7; ring++) {
         const size = radius * (.5 + ring * .13)
+        const steps = Math.max(96, Math.min(360, Math.ceil(size * Math.PI * 2 / 10)))
         ctx.beginPath()
-        for (let step = 0; step <= 72; step++) {
-          const angle = step / 72 * Math.PI * 2
+        for (let step = 0; step <= steps; step++) {
+          const angle = step / steps * Math.PI * 2
           const edge = 1 + .1 * Math.sin(angle * 3 + seed) + .055 * Math.cos(angle * 5 - seed) + .018 * Math.sin(angle * 4 + phase * .35 + ring * .4)
           const x = Math.cos(angle) * size * edge
           const y = Math.sin(angle) * size * .62 * edge
-          if (!step) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
+          point(x, y, !step)
         }
         ctx.closePath()
         ctx.strokeStyle = `rgba(${color},${.14 - ring * .009})`
@@ -127,15 +132,19 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
         const y = row * radius * .095
         const wave = Math.sin(phase * .3 + row) * 5
         ctx.beginPath()
-        ctx.moveTo(-radius * .32, y)
-        ctx.bezierCurveTo(-radius * .1, y - 8 + wave, radius * .12, y + 8 - wave, radius * .34, y)
+        for (let step = 0; step <= 32; step++) {
+          const t = step / 32, u = 1 - t
+          point(radius * (-.32 * u ** 3 - .3 * u * u * t + .36 * u * t * t + .34 * t ** 3), y + 3 * u * u * t * (-8 + wave) + 3 * u * t * t * (8 - wave), !step)
+        }
         ctx.stroke()
       }
-      ctx.restore()
     }
 
     function paint(dt: number) {
       const ctx = context!
+      accumulator += dt
+      while (accumulator >= 1 / 60) { water.step(); accumulator -= 1 / 60 }
+      water.updateNormals()
       const ease = 1 - Math.exp(-dt * 4)
       pointerX += (targetX - pointerX) * ease
       pointerY += (targetY - pointerY) * ease
@@ -158,28 +167,23 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
         const rootY = height * .9 + y * .5
         const sway = Math.sin(phase * .35 + stem * .55) * 7
         ctx.beginPath()
-        ctx.moveTo(rootX, rootY)
-        ctx.quadraticCurveTo(rootX - 10 + sway, rootY - 40, rootX - 5 + sway, rootY - 75 - stem * 5)
+        for (let step = 0; step <= 24; step++) {
+          const t = step / 24, u = 1 - t
+          water.project(rootX + 2 * u * t * (-10 + sway) + t * t * (-5 + sway), rootY - 80 * u * t - t * t * (75 + stem * 5))
+          if (!step) ctx.moveTo(water.x, water.y)
+          else ctx.lineTo(water.x, water.y)
+        }
         ctx.stroke()
       }
       const pollen = width < 768 ? 12 : 24
       for (let dot = 0; dot < pollen; dot++) {
         const px = ((dot * .618033 + .12) % 1) * width + Math.sin(phase * .12 + dot) * 10 + x * .2
         const py = ((dot * .381966 + .23) % 1) * height + Math.cos(phase * .13 + dot * 2) * 10 + y * .2
+        water.project(px, py)
         ctx.beginPath()
-        ctx.arc(px, py, dot % 3 ? 1.2 : 2, 0, Math.PI * 2)
+        ctx.arc(water.x, water.y, dot % 3 ? 1.2 : 2, 0, Math.PI * 2)
         ctx.fillStyle = dot % 3 ? 'rgba(17,111,182,.13)' : 'rgba(210,163,31,.25)'
         ctx.fill()
-      }
-      for (let index = ripples.length - 1; index >= 0; index--) {
-        const ripple = ripples[index]
-        ripple.age += dt
-        if (ripple.age > 1.6) { ripples.splice(index, 1); continue }
-        ctx.beginPath()
-        ctx.ellipse(ripple.x, ripple.y, 12 + ripple.age * 70, 6 + ripple.age * 38, -.2, 0, Math.PI * 2)
-        ctx.strokeStyle = `rgba(17,111,182,${.24 * (1 - ripple.age / 1.6)})`
-        ctx.lineWidth = 1
-        ctx.stroke()
       }
     }
 
@@ -195,28 +199,47 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
       cancelAnimationFrame(frame)
       frame = 0
       lastPaint = 0
-      pressed = false
+      pressed = touchingBackground = pendingTouch = false
       if (!document.hidden && !reduced) frame = requestAnimationFrame(tick)
     }
-    function addRipple(event: PointerEvent) {
-      if (performance.now() - lastRipple < 160) return
-      lastRipple = performance.now()
-      ripples.push({ x: event.clientX, y: event.clientY, age: 0 })
-      if (ripples.length > 5) ripples.shift()
+    function stir(x: number, y: number) {
+      if (performance.now() - lastImpact < 33 || Math.hypot(x - impactX, y - impactY) < 8) return
+      const steps = Math.min(4, Math.ceil(Math.hypot(x - impactX, y - impactY) / 18))
+      for (let step = 1; step <= steps; step++) water.disturb(impactX + (x - impactX) * step / steps, impactY + (y - impactY) * step / steps, 16, -1.3)
+      impactX = x
+      impactY = y
+      lastImpact = performance.now()
     }
     function down(event: PointerEvent) {
-      if (!event.isPrimary || (event.target instanceof Element && event.target.closest(interactive))) return
+      if (!event.isPrimary || event.button !== 0) return
+      if (event.target instanceof Element && event.target.closest(interactive)) {
+        // A link tap stays a link tap. If the browser turns it into a scroll,
+        // subsequent finger movement can still leave a gentle wake.
+        pendingTouch = event.pointerType === 'touch' && !!event.target.closest('a') && !event.target.closest('dialog')
+        if (pendingTouch) {
+          previousX = impactX = event.clientX
+          previousY = impactY = event.clientY
+          lastImpact = performance.now()
+        }
+        return
+      }
+      pendingTouch = false
       pressed = true
+      touchingBackground = event.pointerType === 'touch'
       previousX = event.clientX
       previousY = event.clientY
       targetX = event.clientX / width - .5
       targetY = event.clientY / height - .5
       forceX = targetX * 12
       forceY = targetY * 12
-      addRipple(event)
+      water.disturb(event.clientX, event.clientY, 23, -10)
+      impactX = event.clientX
+      impactY = event.clientY
+      lastImpact = performance.now()
     }
     function move(event: PointerEvent) {
       if (!event.isPrimary) return
+      if (event.pointerType === 'touch') return
       if (event.pointerType === 'mouse' || pressed) {
         targetX = event.clientX / width - .5
         targetY = event.clientY / height - .5
@@ -226,10 +249,26 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
         forceY = clamp(forceY + (event.clientY - previousY) * .45, 30)
         previousX = event.clientX
         previousY = event.clientY
-        addRipple(event)
+        stir(event.clientX, event.clientY)
       }
     }
-    function release() { pressed = false }
+    function touchMove(event: TouchEvent) {
+      if (!touchingBackground || event.touches.length !== 1) return
+      const touch = event.touches[0]
+      targetX = touch.clientX / width - .5
+      targetY = touch.clientY / height - .5
+      forceX = clamp(forceX + (touch.clientX - previousX) * .45, 30)
+      forceY = clamp(forceY + (touch.clientY - previousY) * .45, 30)
+      previousX = touch.clientX
+      previousY = touch.clientY
+      stir(touch.clientX, touch.clientY)
+    }
+    function release(event: Event) {
+      pressed = false
+      if (event.type === 'pointercancel') {
+        if (pendingTouch) { touchingBackground = true; pendingTouch = false }
+      } else { touchingBackground = pendingTouch = false }
+    }
     function scroll() {
       targetScroll = scrollY
       forceY = clamp(forceY - (scrollY - previousScroll) * .12, 30)
@@ -242,6 +281,9 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
       window.addEventListener('pointermove', move, { passive: true })
       window.addEventListener('pointerup', release, { passive: true })
       window.addEventListener('pointercancel', release, { passive: true })
+      window.addEventListener('touchmove', touchMove, { passive: true })
+      window.addEventListener('touchend', release, { passive: true })
+      window.addEventListener('touchcancel', release, { passive: true })
       window.addEventListener('blur', release)
       window.addEventListener('scroll', scroll, { passive: true })
       document.addEventListener('visibilitychange', visibility)
@@ -254,6 +296,9 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', release)
       window.removeEventListener('pointercancel', release)
+      window.removeEventListener('touchmove', touchMove)
+      window.removeEventListener('touchend', release)
+      window.removeEventListener('touchcancel', release)
       window.removeEventListener('blur', release)
       window.removeEventListener('scroll', scroll)
       document.removeEventListener('visibilitychange', visibility)
