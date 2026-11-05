@@ -1,8 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { Locale } from './data'
-
-type Appearance = 'classic' | 'lakes'
-const storageKey = 'lipiany-appearance'
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -25,11 +21,11 @@ function usePageReveal(pageKey: string, reduced: boolean) {
     const animations = new Set<Animation>()
     function reveal(element: Element) {
       const siblings = Array.from(element.parentElement?.children || [])
-      const delay = Math.max(0, siblings.indexOf(element) % 4) * 45
+      const delay = Math.max(0, siblings.indexOf(element) % 4) * 30
       const animation = element.animate([
-        { opacity: 0, translate: '0 10px' },
-        { opacity: 1, translate: '0 0' },
-      ], { duration: 480, delay, easing: 'cubic-bezier(.2,.65,.3,1)', fill: 'backwards' })
+        { opacity: 0 },
+        { opacity: 1 },
+      ], { duration: 650, delay, easing: 'ease-out', fill: 'backwards' })
       animations.add(animation)
       animation.addEventListener('finish', () => animations.delete(animation), { once: true })
     }
@@ -266,22 +262,8 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
   return <canvas className="lake-background" ref={ref} aria-hidden="true" />
 }
 
-export function SiteMotion({ lang, pageKey }: { lang: Locale; pageKey: string }) {
-  const [appearance, setAppearance] = useState<Appearance>(() => {
-    try { return localStorage.getItem(storageKey) === 'lakes' ? 'lakes' : 'classic' } catch { return 'classic' }
-  })
+export function SiteMotion({ pageKey }: { pageKey: string }) {
   const reduced = useReducedMotion()
   usePageReveal(pageKey, reduced)
-  useLayoutEffect(() => {
-    document.documentElement.dataset.scene = appearance
-    return () => { delete document.documentElement.dataset.scene }
-  }, [appearance])
-  useEffect(() => { try { localStorage.setItem(storageKey, appearance) } catch { /* The selected mode still works without storage. */ } }, [appearance])
-  return <>
-    {appearance === 'lakes' && <LakeBackground reduced={reduced} />}
-    <div className="appearance-switch" role="group" aria-label={lang === 'pl' ? 'Wygląd strony' : 'Seitendarstellung'}>
-      <button type="button" aria-pressed={appearance === 'classic'} onClick={() => setAppearance('classic')}>{lang === 'pl' ? 'Klasyczny' : 'Standard'}</button>
-      <button type="button" aria-pressed={appearance === 'lakes'} onClick={() => setAppearance('lakes')}><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M2 6c2-3 4 3 7 0s5 3 9 0M2 10c2-3 4 3 7 0s5 3 9 0M2 14c2-3 4 3 7 0s5 3 9 0" /></svg>{lang === 'pl' ? 'Jeziora' : 'Seen'}</button>
-    </div>
-  </>
+  return <LakeBackground reduced={reduced} />
 }
