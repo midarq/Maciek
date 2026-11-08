@@ -581,6 +581,32 @@ h4, h5, h6 { font-size: var(--title-sm); }
   background: var(--yellow);
   border-radius: 50%;
 }
+/* Druga odmiana: treść jest, ale czeka na decyzję klienta (dane z poprzedniej
+   edycji albo z niezatwierdzonego dokumentu). Niebieska, żeby nie myliła się
+   z żółtym „Do uzupełnienia”. */
+.unconfirmed {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-block: 6px;
+  margin-right: 10px;
+  padding: 6px 11px;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: var(--line-caption);
+  color: #0d4f7d;
+  background: #e8f2fa;
+  border: 1px dashed #5e9ccb;
+  border-radius: 7px;
+}
+.unconfirmed::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  background: var(--blue);
+  border-radius: 50%;
+}
 .table-placeholder { color: #7a5200; font-size: var(--text-caption); font-weight: 600; }
 .schedule-table { margin-block: 22px; }
 .schedule-table table, .children-table table { width: 100%; border-collapse: collapse; font-size: var(--text-small); }

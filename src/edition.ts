@@ -56,11 +56,13 @@ export const edition = {
     variants: { sprint: null, olimpijka: null, sztafety: null, dzieci: null, '1000': null, '3000': null } as Record<string, string | null>,
   },
   resources: { triathlon: emptyResources(), 'open-water': emptyResources(), bieg: emptyResources(), dzieci: emptyResources() } as Record<EventId, EventResources>,
-  // UWAGA: program od organizatorów podaje 1000 m i 3000 m, a edycja 2026 miała
-  // 1000 m i 5000 m. Przyjęty został nowszy dokument. Gdyby jednak obowiązywało
-  // 5000 m, zmień tę tablicę, id wiersza '3000' w schedule, klucz w registration
-  // .variants oraz opis i distance wydarzenia 'open-water' powyżej.
+  // Program od organizatorów podaje 1000 m i 3000 m, a edycja 2026 miała
+  // 1000 m i 5000 m. Pokazujemy nowszy dokument, ale strona mówi wprost, że to
+  // czeka na potwierdzenie. Po potwierdzeniu ustaw flagę na true; gdyby jednak
+  // obowiązywało 5000 m, zmień tę tablicę, id wiersza '3000' w schedule, klucz
+  // w registration.variants oraz opis i distance wydarzenia 'open-water'.
   openWaterDistances: ['1000', '3000'],
+  openWaterDistancesConfirmed: false,
   // Program weekendu przekazany przez organizatorów (wiadomość od Macieja,
   // listopad 2026). Godziny i punkty programu przepisane bez zmian; niemieckie
   // etykiety to tłumaczenie tych samych punktów — do przejrzenia przez tłumacza.

@@ -15,6 +15,11 @@ function TablePlaceholder({ lang }: Props) { return <span className="table-place
 export function Missing({ lang, what }: Props & { what?: string }) {
   return <span className="missing">{ui(lang, 'Do uzupełnienia', 'Wird ergänzt')}{what ? `: ${what}` : ''}</span>
 }
+// Inna sytuacja niż brak: dane są, ale pochodzą z poprzedniej edycji albo z
+// dokumentu, którego nikt jeszcze nie zatwierdził. Klient ma to rozstrzygnąć.
+export function Unconfirmed({ lang, what }: Props & { what: string }) {
+  return <span className="unconfirmed">{ui(lang, 'Do potwierdzenia', 'Zu bestätigen')}: {what}</span>
+}
 export function SignupButton({ lang, event, variant, label }: Props & { event: EventId; variant?: string; label?: string }) {
   const url = signupUrl(event, variant)
   const title = label || labels[lang].signup
@@ -78,7 +83,9 @@ function Schedule({ lang, rows }: Props & { rows: ScheduleItem[] }) {
     { key: 'name', label: ui(lang, 'Wydarzenie', 'Programmpunkt'), value: row => row.name[lang] },
     { key: 'place', label: ui(lang, 'Miejsce', 'Ort'), value: row => row.place || '' },
   ]
-  return <div className="schedule-table"><table><thead><tr>{columns.map(column => <th key={column.key} scope="col">{column.label}</th>)}</tr></thead><tbody>{rows.length ? rows.map(row => <tr key={row.id}>{columns.map(column => <td key={column.key} data-label={column.label}>{column.value(row) || <TablePlaceholder lang={lang} />}</td>)}</tr>) : <tr><td colSpan={columns.length}><TablePlaceholder lang={lang} /></td></tr>}</tbody></table></div>
+  const sameDay = new Set(rows.map(row => row.day)).size < 2
+  const shown = columns.filter(column => column.key !== 'day' || !sameDay)
+  return <div className="schedule-table"><table><thead><tr>{shown.map(column => <th key={column.key} scope="col">{column.label}</th>)}</tr></thead><tbody>{rows.length ? rows.map(row => <tr key={row.id}>{shown.map(column => <td key={column.key} data-label={column.label}>{column.value(row) || <TablePlaceholder lang={lang} />}</td>)}</tr>) : <tr><td colSpan={shown.length}><TablePlaceholder lang={lang} /></td></tr>}</tbody></table></div>
 }
 function Resources({ lang, event, routeOnly = false }: Props & { event: EventId; routeOnly?: boolean }) {
   const data = edition.resources[event]
@@ -117,6 +124,7 @@ function TriathlonContent({ lang }: Props) {
 function OpenWaterContent({ lang }: Props) {
   const data = edition.resources['open-water']
   return <section className="section"><div className="shell"><div className="water-distances">{edition.openWaterDistances.map(distance => <section className="distance-option" id={`dystans-${distance}`} key={distance}><h2>{distance} m</h2><p>{distance === '1000' ? ui(lang, 'Krótszy z dwóch dystansów pływackich.', 'Die kürzere der beiden Schwimmdistanzen.') : ui(lang, 'Dłuższe wyzwanie na wodach otwartych, z wyraźnie wytrzymałościowym charakterem.', 'Die längere Freiwasser-Herausforderung mit Ausdauercharakter.')}</p><Slot lang={lang} id={distance} /><SignupButton lang={lang} event="open-water" variant={distance} /></section>)}</div>
+    {!edition.openWaterDistancesConfirmed && <p><Unconfirmed lang={lang} what={ui(lang, 'dystanse — program organizatorów podaje 1000 m i 3000 m, poprzednia edycja miała 1000 m i 5000 m', 'Distanzen — das Programm nennt 1000 m und 3000 m, die letzte Ausgabe hatte 1000 m und 5000 m')} /></p>}
     <h3>{ui(lang, 'Miejsce i sprzęt', 'Ort und Ausrüstung')}</h3>{data.startPlace ? <p>{data.startPlace}</p> : <Missing lang={lang} what={ui(lang, 'miejsce startu', 'Startort')} />}{data.equipment?.length ? <ul>{data.equipment.map(item => <li key={item}>{item}</li>)}</ul> : <Missing lang={lang} what={ui(lang, 'sprzęt', 'Ausrüstung')} />}
   </div></section>
 }
@@ -131,7 +139,7 @@ function RunningContent({ lang }: Props) {
 export function Program2027({ lang, event }: Props & { event?: Event2027 }) {
   const title = event ? `${ui(lang, 'Program', 'Programm')} — ${event.name[lang]}` : ui(lang, 'Program sportowego weekendu', 'Programm des Sportwochenendes')
   return <><PageMeta lang={lang} title={`${title} 2027`} description={event ? ui(lang, `Harmonogram, miejsce i trasy: ${event.name.pl}.`, `Zeitplan, Ort und Strecken: ${event.name.de}.`) : editionCopy.weekend[lang]} /><PageIntro lang={lang} title={title} lead={edition.weekend[lang]} /><section className="section"><div className="shell">
-    {event ? <><Schedule lang={lang} rows={eventSchedule(event.id)} /><Resources lang={lang} event={event.id} routeOnly /><div className="button-row"><SignupButton lang={lang} event={event.id} /></div></> : <><p className="edition-prose">{editionCopy.weekend[lang]}</p>{edition.days.map(day => <section className="program-day" key={day.date}><h2>{day.name[lang]}</h2><Schedule lang={lang} rows={edition.schedule.filter(row => row.day === day.date)} /></section>)}<section className="program-day"><h2>{ui(lang, 'Starty', 'Starts')}</h2><Schedule lang={lang} rows={edition.schedule.filter(row => !row.day)} /></section><aside className="party-note"><h3>{ui(lang, 'Sobotnia impreza dla uczestników', 'Samstagstreffen für Teilnehmer')}</h3><p>{editionCopy.party[lang]}</p>{edition.party.audience || edition.party.entryRules ? <>{edition.party.audience && <p>{edition.party.audience}</p>}{edition.party.entryRules && <p>{edition.party.entryRules}</p>}</> : <Missing lang={lang} what={ui(lang, 'dla kogo i zasady wstępu', 'Zielgruppe und Eintritt')} />}</aside><div className="program-links">{events2027.filter(e => e.id !== 'dzieci').map(e => <Link key={e.id} to={path(lang, e.programSlug)}>{e.name[lang]}<Icon /></Link>)}</div><Link className="button" to={path(lang, 'zapisy')}>{labels[lang].signup}</Link></>}
+    {event ? <><Schedule lang={lang} rows={eventSchedule(event.id)} /><Resources lang={lang} event={event.id} routeOnly /><div className="button-row"><SignupButton lang={lang} event={event.id} /></div></> : <><p className="edition-prose">{editionCopy.weekend[lang]}</p>{edition.days.map(day => <section className="program-day" key={day.date}><h2>{day.name[lang]}</h2><Schedule lang={lang} rows={edition.schedule.filter(row => row.day === day.date)} /></section>)}{edition.schedule.some(row => !row.day) && <section className="program-day"><h2>{ui(lang, 'Starty', 'Starts')}</h2><Schedule lang={lang} rows={edition.schedule.filter(row => !row.day)} /></section>}<aside className="party-note"><h3>{ui(lang, 'Sobotnia impreza dla uczestników', 'Samstagstreffen für Teilnehmer')}</h3><p>{editionCopy.party[lang]}</p>{edition.party.audience || edition.party.entryRules ? <>{edition.party.audience && <p>{edition.party.audience}</p>}{edition.party.entryRules && <p>{edition.party.entryRules}</p>}</> : <Missing lang={lang} what={ui(lang, 'dla kogo i zasady wstępu', 'Zielgruppe und Eintritt')} />}</aside><div className="program-links">{events2027.filter(e => e.id !== 'dzieci').map(e => <Link key={e.id} to={path(lang, e.programSlug)}>{e.name[lang]}<Icon /></Link>)}</div><Link className="button" to={path(lang, 'zapisy')}>{labels[lang].signup}</Link></>}
   </div></section></>
 }
 
@@ -161,7 +169,7 @@ function RulesList({ lang }: Props) {
 export function Rules2027({ lang }: Props) {
   return <><PageMeta lang={lang} title={ui(lang, 'Regulaminy 2027', 'Reglement 2027')} /><PageIntro lang={lang} title={labels[lang].rules} lead={ui(lang, 'Dokumenty dla właściwych zawodów i kategorii.', 'Dokumente für die jeweiligen Wettkämpfe und Klassen.')} /><section className="section"><div className="shell"><RulesList lang={lang} /><Link className="text-link" to={path(lang, 'kontakt')}>{ui(lang, 'Kontakt z organizatorem', 'Kontakt zum Veranstalter')}<Icon /></Link></div></section></>
 }
-export function Partners2027({ lang }: Props) { return <><PageMeta lang={lang} title={labels[lang].partners} /><PageIntro lang={lang} title={labels[lang].partners} centered /><section className="section"><div className="shell">{!edition.partnersConfirmed && <p><Missing lang={lang} what={ui(lang, 'lista partnerów edycji 2027 — poniżej partnerzy z poprzedniej edycji', 'Partnerliste 2027 — unten die Partner der letzten Ausgabe')} /></p>}<PartnerGroups lang={lang} /></div></section></> }
+export function Partners2027({ lang }: Props) { return <><PageMeta lang={lang} title={labels[lang].partners} /><PageIntro lang={lang} title={labels[lang].partners} centered /><section className="section"><div className="shell">{!edition.partnersConfirmed && <p><Unconfirmed lang={lang} what={ui(lang, 'lista partnerów na 2027 — poniżej partnerzy z poprzedniej edycji', 'Partnerliste für 2027 — unten die Partner der letzten Ausgabe')} /></p>}<PartnerGroups lang={lang} /></div></section></> }
 export function Search2027({ lang }: Props) {
   const [params, setParams] = useSearchParams()
   const query = params.get('q') || ''
