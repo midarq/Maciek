@@ -448,8 +448,10 @@ h4, h5, h6 { font-size: var(--title-sm); }
 
 /* Edycja 2027: reference z granatową nawigacją i kolorami logo. */
 :root {
-  --accent: #c4f000;
-  --accent-hover: #d1fb23;
+  /* Zielony ze znaku Triathlon Lipiany zamiast limonki — ten sam odcień,
+     którym świecą kontury jezior w tle (132,196,65 w motion.tsx). */
+  --accent: var(--green);
+  --accent-hover: #93d44f;
   --header-bg: #091b28;
   --header-fg: #f8fafb;
   --header-muted: #afc0cc;
@@ -527,7 +529,7 @@ h4, h5, h6 { font-size: var(--title-sm); }
 .event-hero__facts { margin-top: 18px; font: 700 var(--text-ui)/var(--line-ui) var(--font-family); }
 .event-hero { background: var(--paper); color: var(--ink); }
 .event-hero__lead, .event-hero .breadcrumb { color: var(--muted); }
-.event-hero__date { color: #476000; }
+.event-hero__date { color: #3d6a14; }
 .variant-navigation { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; padding-block: 28px; }
 .variant-navigation a { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 64px; padding: 16px; background: var(--white); border: 1px solid var(--line); border-bottom: 3px solid var(--green); border-radius: 4px; font: 700 var(--text-ui)/var(--line-ui) var(--font-family); text-decoration: none; }
 .variant-navigation .icon { width: 17px; height: 17px; }
