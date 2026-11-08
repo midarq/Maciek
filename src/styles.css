@@ -555,7 +555,33 @@ h4, h5, h6 { font-size: var(--title-sm); }
 .button-row .text-link { min-height: 44px; }
 .program-day { margin-block: 36px; }
 .program-day > h2 { font-size: var(--title-md); margin-bottom: 20px; }
-.table-placeholder { color: var(--muted); font-size: var(--text-caption); }
+/* Etap przeglądu: właściciel chodzi po stronie i wypisuje, czego brakuje.
+   Znacznik ma być widoczny, ale w barwach strony — żółć z logo. Znika sam,
+   gdy dana pozycja zostanie uzupełniona w src/edition.ts. */
+.missing {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-block: 6px;
+  margin-right: 10px;
+  padding: 6px 11px;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: var(--line-caption);
+  color: #7a5200;
+  background: #fff4d6;
+  border: 1px dashed #d79a0a;
+  border-radius: 7px;
+}
+.missing::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  background: var(--yellow);
+  border-radius: 50%;
+}
+.table-placeholder { color: #7a5200; font-size: var(--text-caption); font-weight: 600; }
 .schedule-table { margin-block: 22px; }
 .schedule-table table, .children-table table { width: 100%; border-collapse: collapse; font-size: var(--text-small); }
 .schedule-table th, .schedule-table td, .children-table th, .children-table td { text-align: left; padding: 15px; border-bottom: 1px solid var(--line); line-height: var(--line-compact); vertical-align: top; }
