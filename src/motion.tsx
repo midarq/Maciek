@@ -104,8 +104,8 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
       contours = []
       const layout = [
         { x: .13, y: .57, size: Math.min(690, Math.max(370, width * .48)), rotation: -.24, color: '17,111,182' },
-        { x: .88, y: .23, size: Math.min(570, Math.max(320, width * .4)), rotation: .46, color: '103,156,54' },
-        { x: .73, y: .96, size: Math.min(540, Math.max(270, width * .36)), rotation: -.12, color: '17,111,182' },
+        { x: .88, y: .23, size: Math.min(570, Math.max(320, width * .4)) * 1.12, rotation: .46, color: '103,156,54' },
+        { x: .73, y: .96, size: Math.min(540, Math.max(270, width * .36)) * 1.12, rotation: -.12, color: '17,111,182' },
       ]
       lakeContours.forEach((rings, index) => {
         const { x, y, size, rotation, color } = layout[index]

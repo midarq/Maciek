@@ -87,6 +87,38 @@ function smoothShore(points: ShorePoint[]): ShorePoint[] {
   return result
 }
 
+function softenContour(outline: ShorePoint[]): ShorePoint[] {
+  const lengths = outline.map(([x, y], index) => {
+    const next = outline[(index + 1) % outline.length]
+    return Math.hypot(next[0] - x, next[1] - y)
+  })
+  const perimeter = lengths.reduce((sum, length) => sum + length, 0)
+  const count = Math.ceil(perimeter / .004), spacing = perimeter / count
+  let segment = 0, distance = 0
+  // Equal spacing keeps the rounding consistent around bays and long shores.
+  const samples = Array.from({ length: count }, (_, index): ShorePoint => {
+    const along = index * spacing
+    while (segment < lengths.length - 1 && distance + lengths[segment] < along) {
+      distance += lengths[segment++]
+    }
+    const from = outline[segment], to = outline[(segment + 1) % outline.length]
+    const t = (along - distance) / Math.max(lengths[segment], 1e-12)
+    return [from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t]
+  })
+  const sigma = .016 / spacing, radius = Math.ceil(sigma * 3)
+  const weights = Array.from({ length: radius * 2 + 1 }, (_, index) => Math.exp(-.5 * ((index - radius) / sigma) ** 2))
+  const total = weights.reduce((sum, weight) => sum + weight, 0)
+  return samples.map((_, index): ShorePoint => {
+    let x = 0, y = 0
+    weights.forEach((weight, offset) => {
+      const point = samples[(index + offset - radius + count) % count]
+      x += point[0] * weight
+      y += point[1] * weight
+    })
+    return [x / total, y / total]
+  })
+}
+
 // Parallel outlines follow the shoreline instead of shrinking it about a point.
 // A distance field merges narrow inlets naturally, without crossed contour copies.
 function shorelineContours(shore: ShorePoint[]): ShorePoint[][] {
@@ -176,13 +208,7 @@ function shorelineContours(shore: ShorePoint[]): ShorePoint[][] {
     }
     // Keep the enclosing shoreline if a narrow bay closes into a small inner loop.
     const outline = paths.sort((a, b) => b.length - a.length)[0]
-    const spaced = outline.filter((point, index) => index === 0 ||
-      Math.hypot(point[0] - outline[index - 1][0], point[1] - outline[index - 1][1]) > 1.5 / resolution || index % 3 === 0)
-    return spaced.map((point, index) => {
-      const before = spaced[(index - 1 + spaced.length) % spaced.length]
-      const after = spaced[(index + 1) % spaced.length]
-      return [(before[0] + point[0] * 2 + after[0]) / 4, (before[1] + point[1] * 2 + after[1]) / 4] as const
-    })
+    return softenContour(outline)
   })
 }
 
