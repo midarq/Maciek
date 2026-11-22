@@ -131,6 +131,7 @@ function LakeBackground({ reduced }: { reduced: boolean }) {
       if (washContext) ctx.drawImage(wash, 0, 0, width, height)
       else { ctx.fillStyle = '#f5f8f7'; ctx.fillRect(0, 0, width, height) }
       ctx.lineWidth = 1
+      ctx.lineJoin = 'round'
       for (const { points, color } of contours) {
         ctx.beginPath()
         points.forEach(([x, y], index) => {
