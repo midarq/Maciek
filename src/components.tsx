@@ -191,8 +191,8 @@ export function PageMeta({ title, description, lang }: { title: string; descript
   return null
 }
 
-export function PageIntro({ lang, title, lead, children, centered = false }: { lang: Locale; title: string; lead?: string; children?: ReactNode; centered?: boolean }) {
-  return <section className={`page-intro${centered ? ' page-intro--centered' : ''}`}><div className="shell"><nav className="breadcrumb" aria-label={lang === 'pl' ? 'Nawigacja okruszkowa' : 'Brotkrümelnavigation'}><Link to={path(lang)}>{labels[lang].home}</Link><span>/</span><span>{title}</span></nav><h1>{title}</h1>{lead && <p>{lead}</p>}{children}</div></section>
+export function PageIntro({ lang, title, lead, children, centered = false, image, eyebrow }: { lang: Locale; title: string; lead?: string; children?: ReactNode; centered?: boolean; image?: string; eyebrow?: string }) {
+  return <section className={`page-intro${centered ? ' page-intro--centered' : ''}${image ? ' page-intro--photo' : ''}`}><div className="shell page-intro__inner"><div className="page-intro__copy"><nav className="breadcrumb" aria-label={lang === 'pl' ? 'Nawigacja okruszkowa' : 'Brotkrümelnavigation'}><Link to={path(lang)}>{labels[lang].home}</Link><span>/</span><span>{title}</span></nav><p className="eyebrow">{eyebrow || edition.weekend[lang]}</p><h1>{title}</h1>{lead && <p className="page-intro__lead">{lead}</p>}{children}</div>{image && <figure className="page-intro__photo"><img src={localUrl(image)} alt="" width="1400" height="934" fetchPriority="high" /><span className="discipline-stripe" aria-hidden="true"><span /><span /><span /></span></figure>}</div></section>
 }
 
 export function Loading({ lang }: { lang: Locale }) { return <div className="loading shell" role="status"><span className="loading__dot" />{labels[lang].loading}</div> }

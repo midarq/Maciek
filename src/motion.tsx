@@ -13,7 +13,7 @@ function useReducedMotion() {
   return reduced
 }
 
-const revealSelector = '.home-hero__content > *, .section-heading, .weekend-overview__heading, .race-card, .partner-group, .page-intro > .shell, .event-hero__inner > div, .info-block > h2, .program-day > h2, .distance-grid > div, .distance-option, .party-note, .resource-grid > section, .rules-list > section'
+const revealSelector = '.home-hero__content > *, .section-heading, .weekend-overview__heading, .race-card, .partner-group, .page-intro > .shell, .event-hero__inner > div, .info-block > h2, .program-day > h2, .subpage .document-card, .subpage .info-panel, .distance-grid > div, .distance-option, .party-note, .resource-grid > section, .rules-list > section'
 
 function usePageReveal(pageKey: string, reduced: boolean) {
   useLayoutEffect(() => {

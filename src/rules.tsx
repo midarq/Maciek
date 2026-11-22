@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
 import type { Locale } from './data'
 import { contact, labels, path } from './data'
 import { edition, events2027, say, signupUrl, startSlot } from './edition'
@@ -17,13 +17,12 @@ export function RulesFor({ lang, event, variant }: Props) {
   if (approved) return <a href={localUrl(approved.url)}>{approved.name[lang]}</a>
   return <ul className="rule-links">{documentsFor(event, variant).map(document => <li key={document.id}>
     {document.url ? <a href={localUrl(document.url)}>{document.name[lang]} — 2027</a>
-      : reviewContent ? <Link to={`${path(lang, 'regulaminy')}#${document.id}`}>{document.name[lang]} — {say(lang, 'projekt 2027', 'Entwurf 2027')}</Link>
+      : reviewContent ? <Link to={path(lang, `regulaminy/${document.id}`)}>{document.name[lang]} — {say(lang, 'projekt 2027', 'Entwurf 2027')}</Link>
         : <><span>{document.name[lang]}</span>{pending(lang)}</>}
   </li>)}</ul>
 }
 
-function RuleDraft({ lang, document }: { lang: Locale; document: RuleDocument }) {
-  const { hash } = useLocation()
+export function RuleDocumentArticle({ lang, document }: { lang: Locale; document: RuleDocument }) {
   const row = startSlot(document.startId), data = edition.resources[document.event]
   const label = (pl: string, de: string) => say(lang, pl, de)
   const facts = [
@@ -43,15 +42,14 @@ function RuleDraft({ lang, document }: { lang: Locale; document: RuleDocument })
     [label('IX. Reklamacje', 'IX. Beschwerden'), label('Sposób, adres i terminy zgłoszenia oraz rozpatrzenia reklamacji.', 'Verfahren, Anschrift und Fristen für das Einreichen und Bearbeiten von Beschwerden.')],
     [label('X. Postanowienia końcowe', 'X. Schlussbestimmungen'), label('Zasady bezpieczeństwa, zmiany lub odwołanie zawodów i pozostałe zatwierdzone postanowienia.', 'Sicherheitsregeln, Änderungen oder Absage des Wettkampfs und weitere bestätigte Bestimmungen.')],
   ]
-  return <details className="rule-draft" id={document.id} open={hash === `#${document.id}` || undefined}>
-    <summary>{document.name[lang]} — {label('projekt regulaminu 2027', 'Reglemententwurf 2027')}</summary>
+  return <article className={`rule-document rule-document--${document.event}`}>
     <div className="rule-draft__body">
       <p className="eyebrow">{label('Wersja robocza — do zatwierdzenia', 'Entwurf — zu bestätigen')}</p>
       <h4>{label('I–II. Organizacja, termin i trasa', 'I–II. Organisation, Termin und Strecke')}</h4>
-      <div className="schedule-table"><table><tbody>{facts.map(([name, value]) => <tr key={name}><th scope="row">{name}</th><td>{value || pending(lang)}</td></tr>)}</tbody></table></div>
+      <dl className="detail-list document-facts">{facts.map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value || pending(lang)}</dd></div>)}</dl>
       {data.routeDescription && <p>{data.routeDescription[lang]}</p>}
       <h4>{sections[0][0]}</h4>
-      {document.event === 'dzieci' && edition.children.categories.length > 0 && <div className="schedule-table"><table><thead><tr><th>{label('Kategoria', 'Altersklasse')}</th><th>{label('Roczniki 2027', 'Geburtsjahrgänge 2027')}</th><th>{label('Dystans', 'Distanz')}</th></tr></thead><tbody>{edition.children.categories.map(category => <tr key={category.age}><th scope="row">{category.name[lang]} · {category.age}</th><td>{category.birthYears}</td><td>{category.swim} / {category.bike} / {category.run}</td></tr>)}</tbody></table></div>}
+      {document.event === 'dzieci' && edition.children.categories.length > 0 && <div className="children-table"><table><thead><tr><th>{label('Kategoria', 'Altersklasse')}</th><th>{label('Roczniki 2027', 'Geburtsjahrgänge 2027')}</th><th>{label('Dystans', 'Distanz')}</th></tr></thead><tbody>{edition.children.categories.map(category => <tr key={category.age}><th scope="row">{category.name[lang]} · {category.age}</th><td>{category.birthYears}</td><td>{category.swim} / {category.bike} / {category.run}</td></tr>)}</tbody></table></div>}
       <p>{sections[0][1]}</p>{pending(lang)}
       <h4>{sections[1][0]}</h4><p>{sections[1][1]}</p>{signupUrl(document.event) ? <a href={signupUrl(document.event)!}>{labels[lang].signup}</a> : pending(lang)}
       <h4>{label('V. Sprzęt i przebieg zawodów', 'V. Ausrüstung und Wettkampfablauf')}</h4>
@@ -64,16 +62,19 @@ function RuleDraft({ lang, document }: { lang: Locale; document: RuleDocument })
       {sections.slice(2).map(([title, description]) => <section key={title}><h4>{title}</h4><p>{description}</p>{pending(lang)}</section>)}
       <p className="rule-draft__source"><a href={document.source} target="_blank" rel="noopener noreferrer">{label('Pierwowzór 2026 — materiał archiwalny', 'Vorlage 2026 — Archivmaterial')}</a></p>
     </div>
-  </details>
+  </article>
 }
 
 export function RulesDirectory({ lang, drafts = false }: { lang: Locale; drafts?: boolean }) {
-  return <div className={`rules-list${drafts && reviewContent ? ' rules-list--drafts' : ''}`}>{events2027.map(event => <section key={event.id}>
-    <h3>{event.id === 'dzieci' ? say(lang, 'Triathlon dzieci i młodzieży', 'Kinder- und Jugendtriathlon') : event.name[lang]}</h3>
-    {drafts && reviewContent ? documentsFor(event.id).map(document => document.url
-      ? <p key={document.id}><a href={localUrl(document.url)}>{document.name[lang]} — 2027</a></p>
-      : <RuleDraft key={document.id} lang={lang} document={document} />)
-      : <RulesFor lang={lang} event={event.id} />}
+  const Heading = drafts ? 'h2' : 'h3'
+  const CardHeading = drafts ? 'h3' : 'h4'
+  return <div className="rules-directory">{events2027.map(event => <section className="rule-group" id={`rules-${event.id}`} key={event.id}>
+    <Heading>{event.id === 'dzieci' ? say(lang, 'Triathlon dzieci i młodzieży', 'Kinder- und Jugendtriathlon') : event.name[lang]}</Heading>
+    <div className="document-grid">{documentsFor(event.id).map(document => <article className={`document-card document-card--${event.id}`} key={document.id}>
+      <p className="eyebrow">{document.url ? '2027' : say(lang, 'Projekt 2027', 'Entwurf 2027')}</p>
+      <CardHeading>{document.name[lang]}</CardHeading><p className="document-card__distance">{document.distances}</p>
+      {document.url ? <a className="text-link" href={localUrl(document.url)}>{say(lang, 'Otwórz regulamin', 'Reglement öffnen')}</a>
+        : reviewContent ? <Link className="text-link" to={path(lang, `regulaminy/${document.id}`)}>{say(lang, 'Otwórz projekt', 'Entwurf öffnen')}</Link> : pending(lang)}
+    </article>)}</div>
   </section>)}</div>
 }
-
