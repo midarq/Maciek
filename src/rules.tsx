@@ -12,14 +12,16 @@ const pending = (lang: Locale) => <span className="table-placeholder">{say(lang,
 function documentsFor(event: EventId, variant?: string) {
   return ruleDocuments.filter(document => document.event === event && (!variant || document.id === variant))
 }
+function DocumentRows({ lang, documents, heading = 'h4' }: { lang: Locale; documents: RuleDocument[]; heading?: 'h3' | 'h4' }) {
+  const Heading = heading
+  return <div className="document-grid">{documents.map(document => <article className={`document-card document-card--${document.event}`} key={document.id}>
+    <div className="document-card__copy"><Heading>{document.name[lang]}</Heading><div className="document-meta"><span>{document.distances}</span><span>{document.url ? '2027' : say(lang, 'Projekt 2027', 'Entwurf 2027')}</span></div></div>
+    {document.url ? <a className="text-link" href={localUrl(document.url)}>{say(lang, 'Otwórz regulamin', 'Reglement öffnen')}</a> : reviewContent ? <Link className="text-link" to={path(lang, `regulaminy/${document.id}`)}>{say(lang, 'Otwórz projekt', 'Entwurf öffnen')}</Link> : pending(lang)}
+  </article>)}</div>
+}
 export function RulesFor({ lang, event, variant }: Props) {
   const approved = edition.resources[event].rules
-  if (approved) return <a href={localUrl(approved.url)}>{approved.name[lang]}</a>
-  return <ul className="rule-links">{documentsFor(event, variant).map(document => <li key={document.id}>
-    {document.url ? <a href={localUrl(document.url)}>{document.name[lang]} — 2027</a>
-      : reviewContent ? <Link to={path(lang, `regulaminy/${document.id}`)}>{document.name[lang]} — {say(lang, 'projekt 2027', 'Entwurf 2027')}</Link>
-        : <><span>{document.name[lang]}</span>{pending(lang)}</>}
-  </li>)}</ul>
+  return approved ? <a className="text-link" href={localUrl(approved.url)}>{approved.name[lang]}</a> : <DocumentRows lang={lang} documents={documentsFor(event, variant)} />
 }
 
 export function RuleDocumentArticle({ lang, document }: { lang: Locale; document: RuleDocument }) {
@@ -67,14 +69,8 @@ export function RuleDocumentArticle({ lang, document }: { lang: Locale; document
 
 export function RulesDirectory({ lang, drafts = false }: { lang: Locale; drafts?: boolean }) {
   const Heading = drafts ? 'h2' : 'h3'
-  const CardHeading = drafts ? 'h3' : 'h4'
-  return <div className="rules-directory">{events2027.map(event => <section className="rule-group" id={`rules-${event.id}`} key={event.id}>
+  return <div className={`rules-directory${drafts ? '' : ' rules-directory--compact'}`}>{events2027.map(event => <section className="rule-group" id={`rules-${event.id}`} key={event.id}>
     <Heading>{event.id === 'dzieci' ? say(lang, 'Triathlon dzieci i młodzieży', 'Kinder- und Jugendtriathlon') : event.name[lang]}</Heading>
-    <div className="document-grid">{documentsFor(event.id).map(document => <article className={`document-card document-card--${event.id}`} key={document.id}>
-      <p className="eyebrow">{document.url ? '2027' : say(lang, 'Projekt 2027', 'Entwurf 2027')}</p>
-      <CardHeading>{document.name[lang]}</CardHeading><p className="document-card__distance">{document.distances}</p>
-      {document.url ? <a className="text-link" href={localUrl(document.url)}>{say(lang, 'Otwórz regulamin', 'Reglement öffnen')}</a>
-        : reviewContent ? <Link className="text-link" to={path(lang, `regulaminy/${document.id}`)}>{say(lang, 'Otwórz projekt', 'Entwurf öffnen')}</Link> : pending(lang)}
-    </article>)}</div>
+    <DocumentRows lang={lang} documents={documentsFor(event.id)} heading={drafts ? 'h3' : 'h4'} />
   </section>)}</div>
 }
