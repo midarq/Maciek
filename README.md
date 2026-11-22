@@ -11,6 +11,17 @@ npm ci
 npm run dev
 ```
 
+Lokalny podgląd pokazuje robocze treści edycji 2027 z niebieskim komunikatem.
+Zawiera propozycje z przekazanej instrukcji, których organizator jeszcze nie
+potwierdził. Aby zobaczyć wersję bez roboczych danych:
+
+```bash
+VITE_REVIEW_CONTENT=false npm run dev
+```
+
+Zwykły build nie włącza podglądu roboczego. `VITE_REVIEW_CONTENT=true` służy
+wyłącznie do przygotowania osobnego builda do przeglądu.
+
 ## Build
 
 ```bash
@@ -42,6 +53,9 @@ endpoint `public/kontakt/wyslij.php`, wymagający działającego `mail()`.
 
 - `src/edition.ts` — termin, konkurencje, dystanse, harmonogram i linki zapisów.
 - `src/edition-pages.tsx` — aktualne widoki zawodów i programu.
+- `src/details.ts` — dwujęzyczne propozycje treści, wspólne lokalizacje, mapy,
+  potwierdzenia danych 2027 i adresy dokumentów.
+- `src/rules.tsx` — wspólny wykaz regulaminów i ich robocze szablony.
 - `src/components.tsx` — nawigacja, stopka i wspólne elementy.
 - `src/styles.css` — typografia, układ i kolory.
 - `src/data.ts` — dane kontaktowe, partnerzy i tłumaczenia interfejsu.
@@ -53,6 +67,12 @@ endpoint `public/kontakt/wyslij.php`, wymagający działającego `mail()`.
 
 Brakujące informacje edycji 2027 mają wartość `null` lub pustą listę.
 Przed uruchomieniem zapisów należy uzupełnić prawdziwe linki w `src/edition.ts`.
+Potwierdzenia tras, lokalizacji, sprzętu i świadczeń są oddzielne w
+`confirmations` w `src/details.ts`. Dopóki pozostają `false`, propozycje nie
+pojawiają się w zwykłym buildzie. Gotowe, zatwierdzone regulaminy należy
+przypisać do `ruleDocuments[].url`; ten sam adres jest używany na podstronach
+zawodów, w programie i w informacjach dla zawodnika. Archiwalne dokumenty 2026
+są wyłącznie źródłem dla roboczych szablonów; nie są oznaczone jako regulaminy 2027.
 Fonty są hostowane lokalnie; ich licencje znajdują się w `public/assets/fonts/`.
 
 Tło jezior pozostaje nieruchome podczas przewijania. Kliknięcie lub pojedyncze
