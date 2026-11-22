@@ -34,13 +34,15 @@ Wynik znajduje się w `dist/`.
 ## GitHub Pages
 
 Workflow `.github/workflows/deploy.yml` publikuje stronę po zmianach na gałęzi
-`main`. W ustawieniach repozytorium jako źródło Pages wybierz **GitHub Actions**.
+`main`. GitHub Pages jest podglądem roboczym dla organizatora i ma włączone
+`VITE_REVIEW_CONTENT=true`: pokazuje propozycje oraz projekty regulaminów z oznaczeniem
+wersji roboczej. W ustawieniach repozytorium jako źródło Pages wybierz **GitHub Actions**.
 Adres i ścieżka strony są pobierane z konfiguracji Pages.
 
 Przykład lokalnego builda dla tego repozytorium:
 
 ```bash
-VITE_BASE_PATH=/Maciek/ VITE_SITE_URL=https://midarq.github.io/Maciek VITE_STATIC_HOSTING=true npm run build:pages
+VITE_BASE_PATH=/Maciek/ VITE_SITE_URL=https://midarq.github.io/Maciek VITE_STATIC_HOSTING=true VITE_REVIEW_CONTENT=true npm run build:pages
 VITE_BASE_PATH=/Maciek/ npm run preview
 ```
 

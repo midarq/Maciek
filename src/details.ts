@@ -3,8 +3,8 @@ import type { EventId } from './edition'
 
 const t = (pl: string, de: string): Localized => ({ pl, de })
 
-// Only confirmed 2027 information is used in a production build. Local development
-// also shows the proposals from the supplied brief, clearly marked as a draft.
+// An ordinary build uses confirmed information. Development and the organizer's
+// GitHub Pages preview also show proposals, clearly marked as a draft.
 export const reviewContent = import.meta.env.VITE_REVIEW_CONTENT === 'true'
   || (import.meta.env.DEV && import.meta.env.VITE_REVIEW_CONTENT !== 'false')
 export const confirmations = {
