@@ -159,7 +159,7 @@ function VariantPreparation({ lang, variant }: Props & { variant: 'sprint' | 'ol
 }
 function TriathlonContent({ lang }: Props) {
   const { hash } = useLocation()
-  const panelForHash = (value: string): TriathlonVariant => ['sprint', 'olimpijka', 'sztafety', 'dzieci'].includes(value.slice(1)) ? value.slice(1) as TriathlonVariant : 'sprint'
+  const panelForHash = (value: string): TriathlonVariant | null => ['sprint', 'olimpijka', 'sztafety', 'dzieci'].includes(value.slice(1)) ? value.slice(1) as TriathlonVariant : null
   const [active, setActive] = useState<TriathlonVariant | null>(() => panelForHash(hash))
   useEffect(() => { setActive(panelForHash(hash)) }, [hash])
   const toggle = (id: TriathlonVariant) => () => setActive(current => current === id ? null : id)
