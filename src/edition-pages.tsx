@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import { contact, labels, path } from './data'
 import type { Locale, Localized } from './data'
 import { edition, editionCopy, events2027, eventDistance, eventPath, eventSchedule, say, signupUrl, startIds, startSlot, text, triathlonVariants } from './edition'
-import type { Event2027, EventId, ScheduleItem } from './edition'
+import type { Event2027, EventId, ScheduleItem, TriathlonVariant } from './edition'
 import { Icon, PageIntro, PageMeta, PartnerGroups } from './components'
 import { localUrl } from './urls'
 import { archivedSitePlan, archivalVideo, reviewContent, routeLaps, ruleDocuments, showDetail } from './details'
@@ -25,9 +25,9 @@ function Paragraphs({ lang, items }: Props & { items: Localized[] | null }) {
 function Section({ id, eyebrow, title, children, className = '' }: { id?: string; eyebrow?: string; title: string; children: ReactNode; className?: string }) {
   return <section className={`section content-section${!title && !eyebrow ? ' content-section--plain' : ''} ${className}`} id={id}><div className="shell">{(eyebrow || title) && <header className="section-heading">{eyebrow && <p className="eyebrow">{eyebrow}</p>}<h2>{title}</h2></header>}<div className="section-body">{children}</div></div></section>
 }
-function SectionNav({ lang, items }: Props & { items: [string, string][] }) {
+function SectionNav({ lang, items, activeId, onSelect }: Props & { items: [string, string][]; activeId?: string | null; onSelect?: (id: string) => void }) {
   const { hash } = useLocation()
-  return <nav className="section-nav shell" aria-label={labels[lang].sections}>{items.map(([id, title]) => <a href={`#${id}`} key={id} aria-current={hash === `#${id}` ? 'location' : undefined}>{title}</a>)}</nav>
+  return <nav className="section-nav shell" aria-label={labels[lang].sections}>{items.map(([id, title]) => <a href={`#${id}`} key={id} onClick={() => onSelect?.(id)} aria-current={(activeId === undefined ? hash.slice(1) : activeId) === id ? 'location' : undefined}>{title}</a>)}</nav>
 }
 export function ContentReviewNotice({ lang }: Props) {
   return reviewContent ? <div className="content-review-notice"><div className="shell">{ui(lang, 'Podgląd roboczy 2027 — propozycje tras, lokalizacji i świadczeń wymagają potwierdzenia organizatora.', 'Entwurf 2027 — Strecken, Orte und Leistungen müssen vom Veranstalter bestätigt werden.')} <Link to={path(lang, 'regulaminy')}>{ui(lang, 'Projekty regulaminów', 'Reglemententwürfe')}</Link></div></div> : null
@@ -138,13 +138,54 @@ function Preparation({ lang, event, documents = true }: Props & { event: EventId
 export function Event2027Page({ lang, event }: Props & { event: Event2027 }) {
   return <><PageMeta lang={lang} title={`${event.name[lang]} 2027`} description={event.description[lang]} /><EventHero lang={lang} event={event} />{event.id === 'triathlon' ? <TriathlonContent lang={lang} /> : <>{event.id === 'open-water' ? <OpenWaterContent lang={lang} /> : <RunningContent lang={lang} />}<Preparation lang={lang} event={event.id} />{event.id === 'bieg' && <RunningArchive lang={lang} />}</>}</>
 }
+function VariantPanel({ lang, id, title, distance, open, onToggle, children }: Props & {
+  id: TriathlonVariant; title: string; distance: string; open: boolean; onToggle: () => void; children: ReactNode
+}) {
+  return <section className="variant-accordion__item" id={id} data-open={open || undefined}>
+    <h2><button className="variant-accordion__toggle" id={`${id}-toggle`} type="button" aria-expanded={open} aria-controls={`${id}-panel`} onClick={onToggle}>
+      <span className="variant-accordion__name">{title}</span>
+      <span className="variant-accordion__distance"><span className="variant-accordion__label">{ui(lang, 'Pływanie / rower / bieg', 'Schwimmen / Rad / Laufen')}</span><span>{distance}</span></span>
+      <span className="variant-accordion__time"><span className="variant-accordion__label">{id === 'dzieci' ? ui(lang, 'Początek', 'Beginn') : 'Start'}</span><span>{startSlot(id)?.time || <TablePlaceholder lang={lang} />}</span></span>
+      <span className="variant-accordion__symbol" aria-hidden="true" />
+    </button></h2>
+    <div className="variant-accordion__panel" id={`${id}-panel`} role="region" aria-labelledby={`${id}-toggle`} hidden={!open}>{children}</div>
+  </section>
+}
+function VariantPreparation({ lang, variant }: Props & { variant: 'sprint' | 'olimpijka' | 'sztafety' }) {
+  return <div className="variant-preparation">
+    <section className="info-panel"><h3>{ui(lang, 'Pakiet startowy', 'Startpaket')}</h3><Paragraphs lang={lang} items={edition.resources.triathlon.package} /><Link className="text-link" to={path(lang, 'dla-zawodnika')}>{ui(lang, 'Odbiór pakietów, dojazd i przygotowanie do startu', 'Startunterlagen, Anreise und Vorbereitung')}</Link></section>
+    <section className="info-panel"><h3>{ui(lang, 'Regulamin i zapisy', 'Reglement und Anmeldung')}</h3>{variant === 'sztafety' ? <><RulesFor lang={lang} event="triathlon" variant="sztafeta-sprint" /><RulesFor lang={lang} event="triathlon" variant="sztafeta-olimpijska" /></> : <RulesFor lang={lang} event="triathlon" variant={variant} />}<SignupButton compact lang={lang} event="triathlon" variant={variant} /></section>
+  </div>
+}
 function TriathlonContent({ lang }: Props) {
-  return <><SectionNav lang={lang} items={[["sprint", 'Sprint'], ['olimpijka', ui(lang, 'Olimpijka', 'Olympisch')], ['sztafety', ui(lang, 'Sztafety', 'Staffeln')], ['dzieci', ui(lang, 'Dzieci i młodzież', 'Kinder und Jugendliche')]]} />
-    <Section title={ui(lang, 'Trasa', 'Strecke')}><p className="edition-prose">{edition.resources.triathlon.routeDescription?.[lang] || <Missing lang={lang} what={ui(lang, 'opis trasy', 'Streckenbeschreibung')} />}</p></Section>
-    {triathlonVariants.map(variant => <Section className="variant-section" id={variant.id} key={variant.id} title={variant.name[lang]} eyebrow={ui(lang, 'Triathlon indywidualny', 'Einzeltriathlon')}><p className="edition-prose">{variant.id === 'sprint' ? ui(lang, 'Sprint 4:18:4 to 400 m pływania, 18 km jazdy na rowerze i 4 km biegu. Krótszy dystans to dobra okazja do pierwszego startu w triathlonie.', 'Sprint 4:18:4 umfasst 400 m Schwimmen, 18 km Radfahren und 4 km Laufen. Die kürzere Sprintdistanz eignet sich gut für deinen ersten Triathlon.') : variant.description[lang]}</p><dl className="distance-grid">{variant.distances.map(distance => <div key={distance.name.pl}><dt>{distance.name[lang]}</dt><dd>{distance.value}</dd></div>)}</dl><div className="variant-info"><Slot lang={lang} id={variant.id} />{variant.id === 'sprint' && <FirstTriathlon lang={lang} />}</div><VariantMaps lang={lang} variant={variant.id} /><div className="section-actions"><RulesFor lang={lang} event="triathlon" variant={variant.id} /><SignupButton compact lang={lang} event="triathlon" variant={variant.id} /></div></Section>)}
-    <Section id="sztafety" title={ui(lang, 'Sztafety', 'Staffeln')}><p className="edition-prose">{editionCopy.relay[lang]}</p><div className="resource-grid"><section className="info-panel"><h3>{ui(lang, 'Warianty', 'Varianten')}</h3><Paragraphs lang={lang} items={edition.relay.variants} /><Slot lang={lang} id="sztafety" /></section><section className="info-panel"><h3>{ui(lang, 'Zespół i zgłoszenia', 'Team und Anmeldung')}</h3>{edition.relay.teamComposition ? <p>{edition.relay.teamComposition[lang]}</p> : <Missing lang={lang} />}{edition.relay.rules && <p>{edition.relay.rules[lang]}</p>}<PendingDetails lang={lang} fields={[text('Zgłoszenie i zmiany składu', 'Anmeldung und Änderungen der Besetzung'), text('Minimalny wiek i klasyfikacja firmowa', 'Mindestalter und Firmenwertung'), text('Limit krótkiej sztafety: 100 czy 110 min', 'Zeitlimit der Sprintstaffel: 100 oder 110 min')]} /></section></div><div className="section-actions"><div><RulesFor lang={lang} event="triathlon" variant="sztafeta-sprint" /><RulesFor lang={lang} event="triathlon" variant="sztafeta-olimpijska" /></div><SignupButton compact lang={lang} event="triathlon" variant="sztafety" /></div></Section>
-    <Preparation lang={lang} event="triathlon" documents={false} />
-    <Section id="dzieci" title={ui(lang, 'Dzieci i młodzież', 'Kinder und Jugendliche')}><p className="edition-prose">{editionCopy.children[lang]}</p>{reviewContent && <Unconfirmed lang={lang} what={ui(lang, 'pływanie 100 m czy około 150 m; wspólny start o 9:30 lub podział na fale', 'Schwimmen 100 m oder etwa 150 m; gemeinsamer Start um 9:30 Uhr oder Startwellen')} />}<div className="children-table"><table><thead><tr>{[ui(lang, 'Kategoria', 'Altersklasse'), ui(lang, 'Wiek', 'Alter'), ui(lang, 'Roczniki', 'Jahrgänge'), ui(lang, 'Pływanie', 'Schwimmen'), ui(lang, 'Rower', 'Rad'), ui(lang, 'Bieg', 'Laufen'), ui(lang, 'Start', 'Start')].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead><tbody>{edition.children.categories.length ? edition.children.categories.map(row => <tr key={row.age}><th scope="row">{row.name[lang]}</th><td>{row.age}</td><td>{row.birthYears}</td><td>{row.swim}</td><td>{row.bike}</td><td>{row.run}</td><td>{row.time || ui(lang, 'Według podziału startów', 'Nach Startwelleneinteilung')}</td></tr>) : <tr><td colSpan={7}><TablePlaceholder lang={lang} /></td></tr>}</tbody></table></div><div className="resource-grid"><div><Slot lang={lang} id="dzieci" /></div><section className="info-panel"><h3>{ui(lang, 'Dla rodzica i opiekuna', 'Für Eltern und Begleitpersonen')}</h3>{edition.children.guardianRules ? <p>{edition.children.guardianRules[lang]}</p> : <Missing lang={lang} />}</section></div><Resources lang={lang} event="dzieci" /><SignupButton compact lang={lang} event="dzieci" /></Section>
+  const { hash } = useLocation()
+  const panelForHash = (value: string): TriathlonVariant => ['sprint', 'olimpijka', 'sztafety', 'dzieci'].includes(value.slice(1)) ? value.slice(1) as TriathlonVariant : 'sprint'
+  const [active, setActive] = useState<TriathlonVariant | null>(() => panelForHash(hash))
+  useEffect(() => { setActive(panelForHash(hash)) }, [hash])
+  const toggle = (id: TriathlonVariant) => () => setActive(current => current === id ? null : id)
+  const childCourse = edition.children.categories[0]
+  return <><SectionNav lang={lang} activeId={active} onSelect={id => setActive(panelForHash(`#${id}`))} items={[["sprint", 'Sprint'], ['olimpijka', ui(lang, 'Olimpijka', 'Olympisch')], ['sztafety', ui(lang, 'Sztafety', 'Staffeln')], ['dzieci', ui(lang, 'Dzieci i młodzież', 'Kinder und Jugendliche')]]} />
+    <Section title={ui(lang, 'Trasa i start', 'Strecke und Start')}><Facts rows={[
+      { label: ui(lang, 'Termin', 'Termin'), value: `${dayName(startSlot('sprint')!.day!, lang)} ${edition.year}` },
+      { label: ui(lang, 'Miejsce startu', 'Startort'), value: edition.resources.triathlon.startPlace?.[lang] || <TablePlaceholder lang={lang} /> },
+    ]} /><p className="edition-prose triathlon-course">{edition.resources.triathlon.routeDescription?.[lang] || <Missing lang={lang} what={ui(lang, 'opis trasy', 'Streckenbeschreibung')} />}</p></Section>
+    <Section title="" className="triathlon-options"><div className="variant-accordion">
+      {triathlonVariants.map(variant => <VariantPanel lang={lang} id={variant.id} key={variant.id} title={variant.name[lang]} distance={variant.distances.map(distance => distance.value.replaceAll(' ', '\u00a0')).join(' / ')} open={active === variant.id} onToggle={toggle(variant.id)}>
+        <p className="edition-prose">{variant.description[lang]}</p>
+        <dl className="distance-grid">{variant.distances.map(distance => <div key={distance.name.pl}><dt>{distance.name[lang]}</dt><dd>{distance.value}</dd></div>)}</dl>
+        <div className="variant-info"><Slot lang={lang} id={variant.id} />{variant.id === 'sprint' && <FirstTriathlon lang={lang} />}</div>
+        <VariantMaps lang={lang} variant={variant.id} /><VariantPreparation lang={lang} variant={variant.id} />
+      </VariantPanel>)}
+      <VariantPanel lang={lang} id="sztafety" title={ui(lang, 'Sztafety', 'Staffeln')} distance={ui(lang, 'Sprint lub olimpijka', 'Sprint oder olympische Distanz')} open={active === 'sztafety'} onToggle={toggle('sztafety')}>
+        <p className="edition-prose">{editionCopy.relay[lang]}</p><Slot lang={lang} id="sztafety" />
+        <div className="resource-grid"><section className="info-panel"><h3>{ui(lang, 'Warianty', 'Varianten')}</h3><Paragraphs lang={lang} items={edition.relay.variants} /></section><section className="info-panel"><h3>{ui(lang, 'Zespół i zgłoszenia', 'Team und Anmeldung')}</h3>{edition.relay.teamComposition ? <p>{edition.relay.teamComposition[lang]}</p> : <Missing lang={lang} />}{edition.relay.rules && <p>{edition.relay.rules[lang]}</p>}<PendingDetails lang={lang} fields={[text('Zgłoszenie i zmiany składu', 'Anmeldung und Änderungen der Besetzung'), text('Minimalny wiek i klasyfikacja firmowa', 'Mindestalter und Firmenwertung'), text('Limit krótkiej sztafety: 100 czy 110 min', 'Zeitlimit der Sprintstaffel: 100 oder 110 min')]} /></section></div>
+        {triathlonVariants.map(variant => <section className="relay-course" key={variant.id}><h3>{variant.name[lang]}</h3><VariantMaps lang={lang} variant={variant.id} /></section>)}
+        <VariantPreparation lang={lang} variant="sztafety" />
+      </VariantPanel>
+      <VariantPanel lang={lang} id="dzieci" title={ui(lang, 'Dzieci i młodzież', 'Kinder und Jugendliche')} distance={childCourse ? `${[childCourse.swim, childCourse.bike, childCourse.run].map(value => value.replaceAll(' ', '\u00a0')).join(' / ')}${reviewContent ? ui(lang, ' · propozycja', ' · Vorschlag') : ''}` : ui(lang, 'Do potwierdzenia', 'Zu bestätigen')} open={active === 'dzieci'} onToggle={toggle('dzieci')}>
+        <p className="edition-prose">{editionCopy.children[lang]}</p>{reviewContent && <Unconfirmed lang={lang} what={ui(lang, 'pływanie 100 m czy około 150 m; wspólny start o 9:30 lub podział na fale', 'Schwimmen 100 m oder etwa 150 m; gemeinsamer Start um 9:30 Uhr oder Startwellen')} />}<div className="children-table"><table><thead><tr>{[ui(lang, 'Kategoria', 'Altersklasse'), ui(lang, 'Wiek', 'Alter'), ui(lang, 'Roczniki', 'Jahrgänge'), ui(lang, 'Pływanie', 'Schwimmen'), ui(lang, 'Rower', 'Rad'), ui(lang, 'Bieg', 'Laufen'), ui(lang, 'Start', 'Start')].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead><tbody>{edition.children.categories.length ? edition.children.categories.map(row => <tr key={row.age}><th scope="row">{row.name[lang]}</th><td>{row.age}</td><td>{row.birthYears}</td><td>{row.swim}</td><td>{row.bike}</td><td>{row.run}</td><td>{row.time || ui(lang, 'Według podziału startów', 'Nach Startwelleneinteilung')}</td></tr>) : <tr><td colSpan={7}><TablePlaceholder lang={lang} /></td></tr>}</tbody></table></div><div className="resource-grid"><div><Slot lang={lang} id="dzieci" /></div><section className="info-panel"><h3>{ui(lang, 'Dla rodzica i opiekuna', 'Für Eltern und Begleitpersonen')}</h3>{edition.children.guardianRules ? <p>{edition.children.guardianRules[lang]}</p> : <Missing lang={lang} />}</section></div><Resources lang={lang} event="dzieci" /><SignupButton compact lang={lang} event="dzieci" />
+      </VariantPanel>
+    </div></Section>
   </>
 }
 function OpenWaterContent({ lang }: Props) {
